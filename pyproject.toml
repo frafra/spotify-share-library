@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "spotify-share-library"
+version = "0.1.0"
+description = ""
+authors = ["Francesco Frassinelli <fraph24@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+spotify = {url = "https://github.com/mental32/spotify.py/archive/ce6c361d052b00c43e32fed35a5d94f0c0eb6575.tar.gz"}
+aiohttp = "^3.6.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^4.6"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
