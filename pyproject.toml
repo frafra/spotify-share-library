@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "spotify-share-library"
-version = "0.1.0"
-description = ""
+version = "0.2.0"
+description = "Keep user's library synced with a shareable playlist on Spotify"
 authors = ["Francesco Frassinelli <fraph24@gmail.com>"]
 
 [tool.poetry.dependencies]
