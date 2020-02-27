@@ -1,0 +1,15 @@
+aiohttp==3.6.2
+async-timeout==3.0.1
+attrs==19.3.0
+chardet==3.0.4
+click==7.0
+h11==0.9.0
+httptools==0.1.1; sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "PyPy"
+idna==2.9
+multidict==4.7.5
+https://github.com/mental32/spotify.py/archive/ce6c361d052b00c43e32fed35a5d94f0c0eb6575.tar.gz
+starlette==0.13.2
+uvicorn==0.11.3
+uvloop==0.14.0; sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "PyPy"
+websockets==8.1
+yarl==1.4.2
