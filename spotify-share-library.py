@@ -8,7 +8,6 @@ import spotify
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
 REDIRECT_URI = os.environ['REDIRECT_URI']
-PUBLIC_LIBRARY = os.environ.get('PUBLIC_LIBRARY', "Public library")
 
 async def auth(request):
     async with spotify.Client(CLIENT_ID, CLIENT_SECRET) as client:
@@ -24,11 +23,13 @@ async def callback(request):
             code=request.query['code'],
             redirect_uri=REDIRECT_URI,
             )
+    display_name = user.display_name or user.id
+    public_library = "%s' Public library" % display_name
     for playlist in await user.get_all_playlists():
-        if playlist.name == PUBLIC_LIBRARY:
+        if playlist.name == public_library:
             break
     else:
-        playlist = await user.create_playlist(PUBLIC_LIBRARY)
+        playlist = await user.create_playlist(public_library)
     tracks = await user.library.get_all_tracks()
     await playlist.replace_tracks(*tracks)
     return web.HTTPFound(playlist.url)
