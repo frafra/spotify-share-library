@@ -9,7 +9,7 @@ import spotify
 
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
-REDIRECT_URI = os.environ['VERCEL_URL']
+REDIRECT_URI = os.environ['REDIRECT_URI']
 
 async def auth(request):
     async with spotify.Client(CLIENT_ID, CLIENT_SECRET) as client:
@@ -41,4 +41,4 @@ routes = [
     Route('/callback', endpoint=callback),
 ]
 
-app = Starlette(os.environ.get('DEBUG', False), routes=routes)
+main = Starlette(os.environ.get('DEBUG', False), routes=routes)
