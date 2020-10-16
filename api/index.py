@@ -9,19 +9,12 @@ import spotify
 
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
-
-def get_redirect_uri(request):
-    redirect_uri = request.headers.get('x-now-deployment-url')
-    if redirect_uri:
-        redirect_uri = 'https://' + redirect_uri + '/callback'
-    else:
-        redirect_uri = os.environ['REDIRECT_URI']
-    return redirect_uri
+REDIRECT_URI = os.environ['VERCEL_URL']
 
 async def auth(request):
     async with spotify.Client(CLIENT_ID, CLIENT_SECRET) as client:
         url = client.oauth2_url(
-            redirect_uri=get_redirect_uri(request),
+            redirect_uri=REDIRECT_URI,
             scopes=['user-library-read', 'playlist-modify-public'])
         return RedirectResponse(url)
 
@@ -30,7 +23,7 @@ async def callback(request):
         user = await spotify.User.from_code(
             client=client,
             code=request.query_params['code'],
-            redirect_uri=get_redirect_uri(request),
+            redirect_uri=REDIRECT_URI,
             )
     display_name = user.display_name or user.id
     public_library = "%s's Public library" % display_name
