@@ -3,4 +3,4 @@ Description
 
 Keep user's library synced with a shareable playlist on Spotify.
 
-Demo: https://spotify-share-library.now.sh/
+Demo: [spotify-share-library.frafra.eu](https://spotify-share-library.frafra.eu)
