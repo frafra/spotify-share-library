@@ -8,4 +8,4 @@ RUN pip install poetry && \
 ADD . .
 
 EXPOSE 8080
-CMD ["/usr/local/bin/poetry", "run", "uvicorn", "app:main"]
+CMD ["/usr/local/bin/poetry", "run", "uvicorn", "app:main", "--host", "0.0.0.0"]
