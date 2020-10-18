@@ -11,8 +11,7 @@ CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
 
 def get_redirect_uri(request):
-    return request.url.components.scheme + '://' + \
-        request.url.components.netloc + '/callback'
+    return "%(x-forwarded-proto)s://%(host)s/callback" % request.headers
 
 async def auth(request):
     async with spotify.Client(CLIENT_ID, CLIENT_SECRET) as client:
