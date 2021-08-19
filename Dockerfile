@@ -7,5 +7,5 @@ RUN pip install poetry && \
     poetry install --no-root --no-dev
 ADD . .
 
-EXPOSE 8080
+EXPOSE 8000
 CMD ["/usr/local/bin/poetry", "run", "uvicorn", "app:main", "--host", "0.0.0.0"]
