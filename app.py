@@ -27,6 +27,7 @@ async def callback(request):
             code=request.query_params['code'],
             redirect_uri=get_redirect_uri(request),
             )
+    user = await user
     display_name = user.display_name or user.id
     public_library = "%s's Public library" % display_name
     for playlist in await user.get_all_playlists():

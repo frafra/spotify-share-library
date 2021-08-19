@@ -1,17 +1,14 @@
 [tool.poetry]
 name = "spotify-share-library"
-version = "0.2.0"
+version = "0.2.1"
 description = "Keep user's library synced with a shareable playlist on Spotify"
 authors = ["Francesco Frassinelli <fraph24@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-spotify = {url = "https://github.com/mental32/spotify.py/archive/ce6c361d052b00c43e32fed35a5d94f0c0eb6575.tar.gz"}
+spotify = {url = "https://github.com/mental32/spotify.py/archive/c52a8d05cc48f02ebcf76afdd4eda893c1ce0855.tar.gz"}
 uvicorn = "^0.11.3"
 starlette = "^0.13.2"
-
-[tool.poetry.dev-dependencies]
-pytest = "^4.6"
 
 [build-system]
 requires = ["poetry>=0.12"]
