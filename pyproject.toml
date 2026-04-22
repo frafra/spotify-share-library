@@ -1,15 +1,18 @@
-[tool.poetry]
+[project]
 name = "spotify-share-library"
 version = "0.2.1"
 description = "Keep user's library synced with a shareable playlist on Spotify"
-authors = ["Francesco Frassinelli <fraph24@gmail.com>"]
+authors = [{name = "Francesco Frassinelli", email = "fraph24@gmail.com"}]
+requires-python = ">=3.14"
+dependencies = [
+    "django-environ>=0.12",
+    "spotipy>=2.26.0",
+    "uvicorn>=0.34",
+    "starlette>=0.46",
+]
 
-[tool.poetry.dependencies]
-python = "^3.7"
-spotify = {url = "https://github.com/mental32/spotify.py/archive/c52a8d05cc48f02ebcf76afdd4eda893c1ce0855.tar.gz"}
-uvicorn = "^0.11.3"
-starlette = "^0.13.2"
+[dependency-groups]
+dev = [
+    "prek>=0.3",
+]
 
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"

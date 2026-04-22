@@ -1,11 +1,11 @@
-FROM python:3.7-slim
+FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim
 LABEL maintainer="fraph24@gmail.com"
 
 WORKDIR /app
-ADD poetry.lock pyproject.toml ./
-RUN pip install poetry && \
-    poetry install --no-root --no-dev
+ADD pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project
 ADD app.py .
 
 EXPOSE 8000
-CMD ["/usr/local/bin/poetry", "run", "uvicorn", "app:main", "--host", "0.0.0.0"]
+CMD ["uv", "run", "uvicorn", "app:main", "--host", "0.0.0.0"]

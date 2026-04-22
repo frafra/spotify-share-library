@@ -1,47 +1,92 @@
 #!/usr/bin/env python3
 
+from itertools import batched
+
+import environ
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 from starlette.applications import Starlette
 from starlette.responses import RedirectResponse
 from starlette.routing import Route
 
-import os
-import spotify
+env = environ.Env(
+    DEBUG=(bool, False),
+)
+environ.Env.read_env()
 
-CLIENT_ID = os.environ['CLIENT_ID']
-CLIENT_SECRET = os.environ['CLIENT_SECRET']
+CLIENT_ID = env("CLIENT_ID")
+CLIENT_SECRET = env("CLIENT_SECRET")
+SCOPES = "user-library-read playlist-modify-public"
+
 
 def get_redirect_uri(request):
-    return "%(x-forwarded-proto)s://%(host)s/callback" % request.headers
+    scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
+    host = request.headers.get("host", request.url.netloc)
+    return f"{scheme}://{host}/callback"
+
+
+def get_oauth(request):
+    return SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=get_redirect_uri(request),
+        scope=SCOPES,
+    )
+
 
 async def auth(request):
-    async with spotify.Client(CLIENT_ID, CLIENT_SECRET) as client:
-        url = client.oauth2_url(
-            redirect_uri=get_redirect_uri(request),
-            scopes=['user-library-read', 'playlist-modify-public'])
-        return RedirectResponse(url)
+    url = get_oauth(request).get_authorize_url()
+    return RedirectResponse(url)
+
 
 async def callback(request):
-    async with spotify.Client(CLIENT_ID, CLIENT_SECRET) as client:
-        user = await spotify.User.from_code(
-            client=client,
-            code=request.query_params['code'],
-            redirect_uri=get_redirect_uri(request),
-            )
-    user = await user
-    display_name = user.display_name or user.id
+    sp_oauth = get_oauth(request)
+    token_info = sp_oauth.get_access_token(request.query_params["code"], as_dict=False)
+    sp = spotipy.Spotify(auth=token_info)
+
+    user = sp.current_user()
+    display_name = user.get("display_name") or user["id"]
     public_library = "%s's Public library" % display_name
-    for playlist in await user.get_all_playlists():
-        if playlist.name == public_library:
+
+    playlist_id = None
+    playlists = sp.current_user_playlists()
+    while playlists:
+        for playlist in playlists["items"]:
+            if playlist["name"] == public_library:
+                playlist_id = playlist["id"]
+                break
+        if playlist_id or not playlists["next"]:
             break
-    else:
-        playlist = await user.create_playlist(public_library)
-    tracks = await user.library.get_all_tracks()
-    await playlist.replace_tracks(*tracks)
-    return RedirectResponse(playlist.url)
+        playlists = sp.next(playlists)
+
+    if not playlist_id:
+        playlist = sp.current_user_playlist_create(public_library)
+        playlist_id = playlist["id"]
+
+    track_uris = []
+    results = sp.current_user_saved_tracks()
+    while results:
+        track_uris.extend(item["track"]["uri"] for item in results["items"])
+        if not results["next"]:
+            break
+        results = sp.next(results)
+
+    chunks = list(batched(track_uris, 100))
+    sp.playlist_replace_items(playlist_id, chunks[0] if chunks else [])
+    for chunk in chunks[1:]:
+        sp.playlist_add_items(playlist_id, chunk)
+
+    return RedirectResponse(f"https://open.spotify.com/playlist/{playlist_id}")
+
 
 routes = [
-    Route('/', endpoint=auth),
-    Route('/callback', endpoint=callback),
+    Route("/", endpoint=auth),
+    Route("/callback", endpoint=callback),
 ]
 
-main = Starlette(os.environ.get('DEBUG', False), routes=routes)
+main = Starlette(env("DEBUG"), routes=routes)
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(main, host="0.0.0.0", port=8000)

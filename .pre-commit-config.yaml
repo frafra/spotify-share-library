@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.11
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.24.1
+    hooks:
+      - id: zizmor
+  - repo: local
+    hooks:
+      - id: pinact
+        name: pinact
+        entry: pinact run --check
+        language: system
+        files: (\.github/workflows/.*\.ya?ml|action\.ya?ml)$
+        pass_filenames: false
+      - id: uv-lock
+        name: uv lock --check
+        entry: uv lock --check
+        language: system
+        files: ^pyproject\.toml$
+        pass_filenames: false
